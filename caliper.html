@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Caliper — Underwriting Intelligence for Residential Property</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@300;400;500;600&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0b0c0a;
+    --ink-soft: #14160f;
+    --paper: #f4f1e8;
+    --paper-warm: #ede8d8;
+    --rule: #2a2c24;
+    --rule-light: #3a3d33;
+    --accent: #d4ff3a;
+    --accent-deep: #a8cc2e;
+    --signal: #ff5b2e;
+    --muted: #8a8a7e;
+    --muted-light: #b0b0a3;
+    --serif: 'Fraunces', serif;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter Tight', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    line-height: 1.5;
+  }
+
+  ::selection { background: var(--accent); color: var(--ink); }
+
+  /* Grain texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+    background: rgba(11, 12, 10, 0.7);
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 18px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-mark {
+    width: 26px; height: 26px;
+    border: 1.5px solid var(--paper);
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+  }
+  .logo-mark::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: -3px; right: -3px;
+    height: 1px;
+    background: var(--paper);
+  }
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .nav-links a {
+    color: var(--muted-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .btn {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 11px 20px;
+    border: 1px solid var(--rule-light);
+    background: transparent;
+    color: var(--paper);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn:hover { border-color: var(--paper); }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--ink);
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: var(--paper); border-color: var(--paper); }
+
+  /* ===== HERO ===== */
+  .hero {
+    padding: 160px 0 80px;
+    position: relative;
+  }
+  .hero-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    gap: 24px;
+    margin-bottom: 56px;
+    align-items: center;
+  }
+  .hero-meta span.dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 80px;
+    align-items: end;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(56px, 7.5vw, 116px);
+    font-weight: 400;
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    color: var(--paper);
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+  }
+  h1 .sub {
+    font-size: 0.7em;
+    color: var(--muted-light);
+  }
+
+  .hero-body {
+    padding-bottom: 12px;
+  }
+  .hero-body p {
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--muted-light);
+    margin-bottom: 32px;
+    max-width: 420px;
+  }
+  .hero-body p strong {
+    color: var(--paper);
+    font-weight: 500;
+  }
+  .hero-cta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* ===== STATS BAR ===== */
+  .stats {
+    margin-top: 120px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .stat {
+    padding: 32px 0;
+    border-right: 1px solid var(--rule);
+    padding-right: 32px;
+    padding-left: 0;
+  }
+  .stat:first-child { padding-left: 0; }
+  .stat:last-child { border-right: none; }
+  .stat:not(:first-child) { padding-left: 32px; }
+
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 56px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--paper);
+    margin-bottom: 8px;
+  }
+  .stat-num .unit {
+    font-size: 24px;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  /* ===== SECTION COMMONS ===== */
+  section {
+    padding: 140px 0;
+    position: relative;
+  }
+
+  .section-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-eyebrow::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 400;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin-bottom: 32px;
+  }
+  h2 em { font-style: italic; color: var(--muted-light); font-weight: 300; }
+
+  /* ===== PHOTO REVIEW MODULE ===== */
+  .photo-section {
+    background: linear-gradient(180deg, var(--ink) 0%, var(--ink-soft) 100%);
+    border-top: 1px solid var(--rule);
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .photo-text p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted-light);
+    margin-bottom: 24px;
+    max-width: 480px;
+  }
+  .checklist {
+    list-style: none;
+    margin-top: 40px;
+    border-top: 1px solid var(--rule);
+  }
+  .checklist li {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    font-size: 15px;
+    color: var(--paper);
+  }
+  .checklist li::before {
+    content: counter(item, decimal-leading-zero);
+    counter-increment: item;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+  .checklist { counter-reset: item; }
+
+  /* Property card mockup */
+  .property-card {
+    background: var(--ink-soft);
+    border: 1px solid var(--rule);
+    padding: 28px;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+  }
+  .property-card::before {
+    content: 'LIVE ANALYSIS';
+    position: absolute;
+    top: -1px;
+    right: 28px;
+    background: var(--accent);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 5px 10px;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+  .property-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .property-id {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+  .property-addr {
+    font-family: var(--serif);
+    font-size: 20px;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .property-risk {
+    text-align: right;
+  }
+  .property-risk-num {
+    font-family: var(--serif);
+    font-size: 36px;
+    line-height: 1;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .property-risk-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  /* Photo thumbnails */
+  .property-photos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .photo-thumb {
+    aspect-ratio: 1;
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+    border: 1px solid var(--rule);
+  }
+  .photo-thumb svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .photo-thumb .tag {
+    position: absolute;
+    top: 6px; left: 6px;
+    font-family: var(--mono);
+    font-size: 9px;
+    background: rgba(11,12,10,0.85);
+    color: var(--paper);
+    padding: 2px 6px;
+    letter-spacing: 0.05em;
+  }
+  .photo-thumb .flag {
+    position: absolute;
+    bottom: 6px; right: 6px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+  }
+  .flag.ok { background: var(--accent); }
+  .flag.warn { background: var(--signal); }
+
+  /* Findings list */
+  .findings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--rule);
+    margin-bottom: 20px;
+  }
+  .finding {
+    background: var(--ink-soft);
+    padding: 14px;
+  }
+  .finding-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .finding-value {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 500;
+  }
+  .finding-value.flag-orange { color: var(--signal); }
+  .finding-value .small { font-size: 12px; color: var(--muted); font-family: var(--mono); font-weight: 400; }
+
+  .property-actions {
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ai-recommendation {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-light);
+    letter-spacing: 0.05em;
+  }
+  .ai-recommendation .pill {
+    background: rgba(212, 255, 58, 0.12);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+
+  /* ===== GEMINI CALL SECTION ===== */
+  .call-section {
+    background: var(--paper);
+    color: var(--ink);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .call-section .section-eyebrow {
+    color: var(--ink);
+  }
+  .call-section .section-eyebrow::before {
+    background: var(--ink);
+  }
+  .call-section h2 em { color: #555; }
+
+  .call-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .call-text p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: #2a2a22;
+    margin-bottom: 24px;
+    max-width: 480px;
+  }
+  .call-text p strong { color: var(--ink); }
+
+  /* Transcript mockup */
+  .transcript {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.15);
+  }
+  .transcript-header {
+    background: var(--ink-soft);
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .call-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .call-status .live-dot {
+    width: 8px; height: 8px;
+    background: var(--signal);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--signal);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .call-status-text {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .call-timer {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted-light);
+    letter-spacing: 0.05em;
+  }
+  .transcript-body {
+    padding: 24px;
+    max-height: 480px;
+    overflow: hidden;
+    position: relative;
+  }
+  .transcript-body::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(transparent, var(--ink));
+    pointer-events: none;
+  }
+  .turn {
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 16px;
+  }
+  .turn-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    padding-top: 4px;
+    text-transform: uppercase;
+  }
+  .turn-meta .speaker {
+    display: block;
+    color: var(--accent);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .turn.homeowner .turn-meta .speaker {
+    color: var(--paper);
+  }
+  .turn-content {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--paper);
+  }
+  .turn.homeowner .turn-content {
+    color: var(--muted-light);
+    font-style: italic;
+  }
+  .turn-content .highlight {
+    background: rgba(212, 255, 58, 0.15);
+    color: var(--accent);
+    padding: 1px 4px;
+  }
+
+  /* Call features */
+  .call-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 32px;
+  }
+  .feature {
+    padding: 20px 0;
+    border-top: 1px solid #ccc8b5;
+  }
+  .feature-icon {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #555;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .feature h4 {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .feature p {
+    font-size: 13px;
+    color: #4a4a3d;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ===== WORKFLOW SECTION ===== */
+  .workflow-section {
+    padding: 160px 0;
+  }
+  .workflow-header {
+    max-width: 720px;
+    margin-bottom: 80px;
+  }
+  .workflow-header p {
+    font-size: 18px;
+    color: var(--muted-light);
+    line-height: 1.5;
+    margin-top: 24px;
+  }
+  .workflow {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+  }
+  .step {
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 32px 28px 40px;
+    position: relative;
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+  }
+  .step:hover { background: var(--ink-soft); }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+  }
+  .step-icon {
+    width: 48px; height: 48px;
+    margin-bottom: 28px;
+    color: var(--paper);
+  }
+  .step-icon svg { width: 100%; height: 100%; stroke: currentColor; }
+  .step h3 {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+  }
+  .step p {
+    font-size: 14px;
+    color: var(--muted-light);
+    line-height: 1.55;
+    flex-grow: 1;
+  }
+  .step-time {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule);
+  }
+  .step-time strong { color: var(--accent); }
+
+  /* ===== COMPARISON TABLE ===== */
+  .compare-section {
+    background: var(--ink-soft);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .compare-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-bottom: 64px;
+    align-items: end;
+  }
+  .compare-header p {
+    font-size: 16px;
+    color: var(--muted-light);
+    line-height: 1.55;
+  }
+  .compare-table {
+    border-top: 1px solid var(--rule);
+  }
+  .compare-row {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1.2fr;
+    border-bottom: 1px solid var(--rule);
+    align-items: center;
+  }
+  .compare-row.head {
+    border-bottom: 1px solid var(--rule-light);
+  }
+  .compare-cell {
+    padding: 22px 24px;
+  }
+  .compare-cell.label {
+    padding-left: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--paper);
+    font-weight: 500;
+  }
+  .compare-cell.label small {
+    display: block;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .compare-cell.head {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .compare-cell.head.us {
+    color: var(--accent);
+  }
+  .compare-cell.legacy {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .compare-cell.us {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--paper);
+    font-weight: 500;
+    border-left: 1px solid var(--rule-light);
+    background: rgba(212, 255, 58, 0.03);
+  }
+  .compare-cell.us strong { color: var(--accent); }
+
+  /* ===== TESTIMONIAL ===== */
+  .quote-section {
+    padding: 180px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .quote-mark {
+    position: absolute;
+    top: 60px;
+    left: 48px;
+    font-family: var(--serif);
+    font-size: 280px;
+    line-height: 1;
+    color: var(--rule);
+    font-style: italic;
+    pointer-events: none;
+  }
+  .quote-content {
+    max-width: 900px;
+    position: relative;
+  }
+  blockquote {
+    font-family: var(--serif);
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 48px;
+    font-style: italic;
+  }
+  blockquote em {
+    color: var(--accent);
+    font-style: italic;
+  }
+  .quote-author {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+  }
+  .author-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5a4a2e, #8b7449);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--paper);
+  }
+  .author-info { font-family: var(--mono); font-size: 12px; }
+  .author-name { color: var(--paper); margin-bottom: 4px; letter-spacing: 0.05em; }
+  .author-title { color: var(--muted); letter-spacing: 0.05em; }
+
+  /* ===== PRICING / CTA ===== */
+  .cta-section {
+    background: var(--accent);
+    color: var(--ink);
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 140px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--accent-deep) 1px, transparent 1px),
+      linear-gradient(90deg, var(--accent-deep) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.15;
+    mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+  }
+  .cta-inner {
+    position: relative;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .cta-section h2 {
+    font-size: clamp(48px, 6.5vw, 96px);
+    line-height: 0.95;
+    margin-bottom: 32px;
+    color: var(--ink);
+  }
+  .cta-section h2 em {
+    color: var(--ink);
+    opacity: 0.6;
+  }
+  .cta-section p {
+    font-size: 18px;
+    color: rgba(11,12,10,0.7);
+    max-width: 560px;
+    margin: 0 auto 48px;
+    line-height: 1.5;
+  }
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-dark {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+    padding: 16px 28px;
+    font-size: 13px;
+  }
+  .btn-dark:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--ink);
+    padding: 16px 28px;
+    font-size: 13px;
+  }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--ink);
+    padding: 80px 0 32px;
+    border-top: 1px solid var(--rule);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 80px;
+  }
+  .footer-brand p {
+    font-family: var(--serif);
+    font-size: 20px;
+    line-height: 1.3;
+    color: var(--muted-light);
+    margin-top: 24px;
+    max-width: 360px;
+    font-style: italic;
+  }
+  .footer-col h5 {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li {
+    margin-bottom: 14px;
+  }
+  .footer-col a {
+    color: var(--muted-light);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--paper); }
+  .footer-bottom {
+    border-top: 1px solid var(--rule);
+    padding-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1024px) {
+    .container { padding: 0 32px; }
+    .nav-inner { padding: 18px 32px; }
+    .hero-grid, .photo-grid, .call-grid, .compare-header { grid-template-columns: 1fr; gap: 40px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: none; }
+    .stat:nth-child(3), .stat:nth-child(4) { border-top: 1px solid var(--rule); }
+    .workflow { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 640px) {
+    .container { padding: 0 20px; }
+    .nav-inner { padding: 16px 20px; }
+    .hero { padding: 130px 0 60px; }
+    .stats { grid-template-columns: 1fr; }
+    .stat { border-right: none; border-top: 1px solid var(--rule); padding: 24px 0 !important; }
+    .stat:first-child { border-top: none; }
+    .workflow { grid-template-columns: 1fr; }
+    .compare-row { grid-template-columns: 1fr; }
+    .compare-cell { padding: 16px 0; }
+    .compare-cell.us { border-left: none; border-top: 1px solid var(--rule); }
+    .property-photos { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    section { padding: 80px 0; }
+    .quote-mark { font-size: 180px; top: 30px; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 12px; }
+  }
+
+  /* fade-in on load */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.25s; }
+  .delay-3 { animation-delay: 0.4s; }
+  .delay-4 { animation-delay: 0.55s; }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <span class="logo-mark"></span>
+      Caliper
+    </div>
+    <div class="nav-links">
+      <a href="#platform">Platform</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#docs">Docs</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="btn">Sign in</a>
+      <a href="#cta" class="btn btn-primary">Book a Demo →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container">
+    <div class="hero-meta fade-up">
+      <span class="dot"></span>
+      <span>v3.2 · Released Q1 2026</span>
+      <span>·</span>
+      <span>SOC 2 Type II · HIPAA</span>
+      <span>·</span>
+      <span>Available for U.S. P&C Carriers</span>
+    </div>
+
+    <div class="hero-grid">
+      <h1 class="fade-up delay-1">
+        Underwriting<br>
+        at the <em>speed</em> of<br>
+        <span class="sub">a property visit —</span><br>
+        without the visit.
+      </h1>
+
+      <div class="hero-body fade-up delay-2">
+        <p>
+          Caliper is the <strong>underwriting workbench</strong> for residential property carriers. Photo intelligence reviews every shingle, soffit, and setback. Voice agents call homeowners to verify what the camera missed.
+        </p>
+        <p style="font-family: var(--mono); font-size: 13px; color: var(--muted);">
+          Built on Gemini 2.5 multimodal · Deployed by 14 carriers · 2.3M policies bound
+        </p>
+        <div class="hero-cta">
+          <a href="#cta" class="btn btn-primary">Request Underwriter Demo</a>
+          <a href="#workflow" class="btn">See the workflow ↓</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats fade-up delay-3">
+      <div class="stat">
+        <div class="stat-num">94<span class="unit">%</span></div>
+        <div class="stat-label">Photo defects auto-classified</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">12<span class="unit">m</span></div>
+        <div class="stat-label">Avg. quote-to-bind</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3.4<span class="unit">×</span></div>
+        <div class="stat-label">Underwriter capacity unlocked</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">18<span class="unit">%</span></div>
+        <div class="stat-label">Loss ratio improvement, yr-1</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PHOTO INTELLIGENCE -->
+<section class="photo-section" id="platform">
+  <div class="container">
+    <div class="photo-grid">
+      <div class="photo-text">
+        <div class="section-eyebrow">Module 01 · Photo Intelligence</div>
+        <h2>Every photo, <em>forensically</em> reviewed.</h2>
+        <p>
+          Drag in a folder of inspection photos, satellite tiles, or homeowner-submitted shots. Caliper segments roof planes, identifies cladding, dates HVAC equipment from serial labels, and flags fifty-six discrete underwriting concerns from a single elevation.
+        </p>
+        <p>
+          What used to take a field inspector half a day takes the model nine seconds — and the audit trail is reviewable, citable, and defensible in carrier proceedings.
+        </p>
+        <ol class="checklist">
+          <li>Roof condition, age, material, slope, and visible damage</li>
+          <li>Defensible-space mapping for wildfire-exposed ZIP codes</li>
+          <li>Pool, trampoline, dog-breed, and trip-hazard detection</li>
+          <li>Square-footage reconciliation vs. county records</li>
+          <li>Auto-generated underwriter memo with photo citations</li>
+        </ol>
+      </div>
+
+      <div class="property-card">
+        <div class="property-header">
+          <div>
+            <div class="property-id">FILE · PRP-481-22A</div>
+            <div class="property-addr">1142 Sycamore Ridge, Asheville NC</div>
+          </div>
+          <div class="property-risk">
+            <div class="property-risk-num">A−</div>
+            <div class="property-risk-label">Underwriting tier</div>
+          </div>
+        </div>
+
+        <div class="property-photos">
+          <div class="photo-thumb">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#5a7088"/>
+                  <stop offset="100%" stop-color="#8a9bac"/>
+                </linearGradient>
+              </defs>
+              <rect width="100" height="60" fill="url(#sky1)"/>
+              <polygon points="10,55 50,20 90,55" fill="#3d3530"/>
+              <polygon points="10,55 50,20 50,25 10,60" fill="#2a2520" opacity="0.6"/>
+              <rect x="20" y="55" width="60" height="45" fill="#a89878"/>
+              <rect x="32" y="65" width="12" height="18" fill="#1a1a1a"/>
+              <rect x="56" y="65" width="12" height="18" fill="#1a1a1a"/>
+              <rect x="44" y="80" width="14" height="20" fill="#3d2a1a"/>
+            </svg>
+            <span class="tag">ELEV·F</span>
+            <span class="flag ok"></span>
+          </div>
+          <div class="photo-thumb">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+              <rect width="100" height="100" fill="#3d3530"/>
+              <g opacity="0.5">
+                <line x1="0" y1="20" x2="100" y2="20" stroke="#1a1410" stroke-width="0.5"/>
+                <line x1="0" y1="40" x2="100" y2="40" stroke="#1a1410" stroke-width="0.5"/>
+                <line x1="0" y1="60" x2="100" y2="60" stroke="#1a1410" stroke-width="0.5"/>
+                <line x1="0" y1="80" x2="100" y2="80" stroke="#1a1410" stroke-width="0.5"/>
+              </g>
+              <circle cx="35" cy="45" r="8" fill="#d4ff3a" opacity="0.4"/>
+              <circle cx="35" cy="45" r="3" fill="#d4ff3a"/>
+              <circle cx="70" cy="65" r="10" fill="#ff5b2e" opacity="0.4"/>
+              <circle cx="70" cy="65" r="3" fill="#ff5b2e"/>
+            </svg>
+            <span class="tag">ROOF·N</span>
+            <span class="flag warn"></span>
+          </div>
+          <div class="photo-thumb">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+              <rect width="100" height="100" fill="#3a4530"/>
+              <rect x="20" y="35" width="60" height="40" fill="#8a8070"/>
+              <rect x="30" y="45" width="10" height="20" fill="#4a3a2a"/>
+              <rect x="50" y="45" width="10" height="20" fill="#4a3a2a"/>
+              <rect x="65" y="45" width="10" height="20" fill="#4a3a2a"/>
+              <polygon points="15,35 50,15 85,35" fill="#5a4a3a"/>
+            </svg>
+            <span class="tag">SHED</span>
+            <span class="flag ok"></span>
+          </div>
+          <div class="photo-thumb">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+              <rect width="100" height="100" fill="#4a5040"/>
+              <ellipse cx="50" cy="60" rx="35" ry="20" fill="#2a4a6a"/>
+              <ellipse cx="50" cy="58" rx="32" ry="17" fill="#3a6a8a"/>
+              <rect x="10" y="20" width="80" height="20" fill="#5a6050"/>
+            </svg>
+            <span class="tag">POOL</span>
+            <span class="flag warn"></span>
+          </div>
+        </div>
+
+        <div class="findings">
+          <div class="finding">
+            <div class="finding-label">Roof age (modeled)</div>
+            <div class="finding-value">17 yrs <span class="small">±2</span></div>
+          </div>
+          <div class="finding">
+            <div class="finding-label">Cladding</div>
+            <div class="finding-value">Hardie board</div>
+          </div>
+          <div class="finding">
+            <div class="finding-label">Hail damage</div>
+            <div class="finding-value flag-orange">Probable <span class="small">N. slope</span></div>
+          </div>
+          <div class="finding">
+            <div class="finding-label">Liability flag</div>
+            <div class="finding-value flag-orange">Pool · no fence</div>
+          </div>
+        </div>
+
+        <div class="property-actions">
+          <div class="ai-recommendation">
+            <span class="pill">RECOMMEND</span>
+            <span>Bind with 2% surcharge; require fence within 30d</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GEMINI VOICE -->
+<section class="call-section">
+  <div class="container">
+    <div class="call-grid">
+      <div class="transcript">
+        <div class="transcript-header">
+          <div class="call-status">
+            <span class="live-dot"></span>
+            <span class="call-status-text">Call in progress</span>
+          </div>
+          <div class="call-timer">02:14 · Gemini 2.5</div>
+        </div>
+        <div class="transcript-body">
+          <div class="turn">
+            <div class="turn-meta">
+              <span class="speaker">CALIPER</span>
+              09:14:02
+            </div>
+            <div class="turn-content">
+              Hi Mr. Reyes, this is Ava calling from Brookline Mutual about your new homeowners application. I just have <span class="highlight">three quick verification questions</span> — should take about four minutes. Do you have a moment?
+            </div>
+          </div>
+          <div class="turn homeowner">
+            <div class="turn-meta">
+              <span class="speaker">HOMEOWNER</span>
+              09:14:09
+            </div>
+            <div class="turn-content">
+              Yeah, sure, go ahead.
+            </div>
+          </div>
+          <div class="turn">
+            <div class="turn-meta">
+              <span class="speaker">CALIPER</span>
+              09:14:11
+            </div>
+            <div class="turn-content">
+              Great. Our inspection noted a pool in the rear yard. Could you confirm whether there's <span class="highlight">a fence or barrier around it</span>, and if so, what height?
+            </div>
+          </div>
+          <div class="turn homeowner">
+            <div class="turn-meta">
+              <span class="speaker">HOMEOWNER</span>
+              09:14:18
+            </div>
+            <div class="turn-content">
+              There's a fence around the whole yard — cedar, maybe five and a half feet. The gate locks.
+            </div>
+          </div>
+          <div class="turn">
+            <div class="turn-meta">
+              <span class="speaker">CALIPER</span>
+              09:14:24
+            </div>
+            <div class="turn-content">
+              Perfect — I'll <span class="highlight">note the perimeter fence and locking gate</span>. Second question: when was the roof last replaced, and do you happen to have the contractor's name?
+            </div>
+          </div>
+          <div class="turn homeowner">
+            <div class="turn-meta">
+              <span class="speaker">HOMEOWNER</span>
+              09:14:32
+            </div>
+            <div class="turn-content">
+              We did it in 2019 — Asheville Roofing Co.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="call-text">
+        <div class="section-eyebrow">Module 02 · Voice Underwriting</div>
+        <h2>The carrier's voice, <em>at every door.</em></h2>
+        <p>
+          Caliper places <strong>Gemini-powered outbound calls</strong> to homeowners and producing agents — confirming gaps the photos couldn't close, scheduling inspections, and capturing missing disclosures. The agent is warm, on-script, and bound by your underwriting playbook.
+        </p>
+        <p>
+          Every call is recorded, transcribed, and <strong>auto-attached to the policy file</strong>. Verified data flows directly into the bind decision. Compliance reviews on Monday morning.
+        </p>
+        <div class="call-features">
+          <div class="feature">
+            <div class="feature-icon">→ MULTILINGUAL</div>
+            <h4>43 languages</h4>
+            <p>English, Spanish, Mandarin, Vietnamese, and 39 more — selected per ZIP cluster.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">→ SCRIPTED</div>
+            <h4>Your playbook</h4>
+            <p>Upload your underwriting Q&A and Caliper runs it verbatim, with empathy.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">→ ESCALATION</div>
+            <h4>Warm handoff</h4>
+            <p>Edge cases route to a licensed underwriter mid-call with full context.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">→ COMPLIANT</div>
+            <h4>TCPA aware</h4>
+            <p>Consent flows, DNC scrubbing, and state-specific recording disclosure built in.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section class="workflow-section" id="workflow">
+  <div class="container">
+    <div class="workflow-header">
+      <div class="section-eyebrow">The Flow</div>
+      <h2>From submission to bind — <em>in twelve minutes.</em></h2>
+      <p>What used to require four handoffs, two inspections, and a week of back-and-forth now runs as a single continuous pipeline. Underwriters review exceptions; Caliper handles the rest.</p>
+    </div>
+
+    <div class="workflow">
+      <div class="step">
+        <div class="step-num">STEP 01</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="8" y="10" width="32" height="28" rx="2"/>
+            <path d="M8 18h32"/>
+            <path d="M16 26h10M16 30h16"/>
+            <circle cx="34" cy="28" r="3"/>
+          </svg>
+        </div>
+        <h3>Intake</h3>
+        <p>Submission arrives via agent portal, API, or carrier CRM. Caliper pulls public-record data, peril maps, and previous loss history within the same minute.</p>
+        <div class="step-time"><strong>0 — 90 sec</strong></div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">STEP 02</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6" y="14" width="36" height="24" rx="2"/>
+            <circle cx="24" cy="26" r="6"/>
+            <circle cx="24" cy="26" r="2.5"/>
+            <path d="M14 14l3-4h14l3 4"/>
+          </svg>
+        </div>
+        <h3>Photo Review</h3>
+        <p>Multimodal models segment every image, score 56 condition factors, and reconcile against tax-assessor records. Defects are flagged with bounding-box citations.</p>
+        <div class="step-time"><strong>90 sec — 3 min</strong></div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">STEP 03</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 8h6l4 8-4 4a20 20 0 0 0 8 8l4-4 8 4v6a4 4 0 0 1-4 4C20 38 10 28 10 14a6 6 0 0 1 4-6z"/>
+            <path d="M30 14h4M28 18h6"/>
+          </svg>
+        </div>
+        <h3>Voice Verification</h3>
+        <p>If gaps remain, Caliper places an outbound call. Homeowner answers confirm or clarify — Mandarin, Spanish, ASL relay, whatever they speak.</p>
+        <div class="step-time"><strong>3 — 9 min</strong></div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">STEP 04</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 12h32v8H8z"/>
+            <path d="M12 20v18h24V20"/>
+            <path d="M18 28h12M18 32h8"/>
+            <path d="M22 24l4 4 6-6" stroke="#d4ff3a" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3>Bind or Refer</h3>
+        <p>A signed underwriting memo with citations lands in the queue. Clear-cut files auto-bind. Exceptions route to a human with the full evidence package attached.</p>
+        <div class="step-time"><strong>9 — 12 min</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="compare-section" id="evidence">
+  <div class="container">
+    <div class="compare-header">
+      <div>
+        <div class="section-eyebrow">The Math</div>
+        <h2>Field underwriting, <em>without the field.</em></h2>
+      </div>
+      <p>
+        Traditional residential underwriting is fundamentally a logistics problem disguised as a risk problem. Caliper resolves the logistics — leaving your team to do the work only humans can: judgment, structure, and final accountability.
+      </p>
+    </div>
+
+    <div class="compare-table">
+      <div class="compare-row head">
+        <div class="compare-cell head">Metric</div>
+        <div class="compare-cell head">Legacy underwriting</div>
+        <div class="compare-cell head us">With Caliper</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell label">
+          Time to clear-to-bind
+          <small>Standard owner-occupied, no exceptions</small>
+        </div>
+        <div class="compare-cell legacy">4–11 days</div>
+        <div class="compare-cell us"><strong>12 minutes</strong></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell label">
+          Files per underwriter / day
+          <small>Excludes commercial and high-value</small>
+        </div>
+        <div class="compare-cell legacy">14</div>
+        <div class="compare-cell us"><strong>48</strong></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell label">
+          Inspection truck rolls
+          <small>Per 1,000 new submissions</small>
+        </div>
+        <div class="compare-cell legacy">780</div>
+        <div class="compare-cell us"><strong>110</strong></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell label">
+          Mid-term cancellation rate
+          <small>Driven by undisclosed conditions</small>
+        </div>
+        <div class="compare-cell legacy">6.2%</div>
+        <div class="compare-cell us"><strong>1.8%</strong></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell label">
+          NPS from producing agents
+          <small>Measured 90 days post-submission</small>
+        </div>
+        <div class="compare-cell legacy">+11</div>
+        <div class="compare-cell us"><strong>+62</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="quote-section">
+  <div class="quote-mark">"</div>
+  <div class="container">
+    <div class="quote-content">
+      <blockquote>
+        We replaced a forty-person inspection-coordination team with three underwriters and Caliper. Loss ratio is down <em>eighteen points</em>. Agents stopped complaining. I keep waiting for the catch.
+      </blockquote>
+      <div class="quote-author">
+        <div class="author-avatar">MH</div>
+        <div class="author-info">
+          <div class="author-name">MARGARET HOLLOWAY</div>
+          <div class="author-title">SVP UNDERWRITING — BROOKLINE MUTUAL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="container">
+    <div class="cta-inner">
+      <div class="section-eyebrow" style="justify-content: center; display: inline-flex; color: var(--ink);">
+        <span style="background: var(--ink); width: 32px; height: 1px; display: inline-block; margin-right: 12px;"></span>
+        For carriers writing 5,000+ policies / yr
+      </div>
+      <h2>The underwriting desk, <em>finally caught up.</em></h2>
+      <p>
+        Two-week pilot with one of your books of business. No platform replacement, no IT lift. We integrate with Guidewire, Duck Creek, and bespoke stacks alike.
+      </p>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-dark">Book a 30-min demo →</a>
+        <a href="#" class="btn btn-ghost">Download technical brief</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <span class="logo-mark"></span>
+          Caliper
+        </div>
+        <p>Underwriting intelligence, measured to the millimeter.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Platform</h5>
+        <ul>
+          <li><a href="#">Photo Intelligence</a></li>
+          <li><a href="#">Voice Underwriting</a></li>
+          <li><a href="#">Bind API</a></li>
+          <li><a href="#">Audit Console</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Research</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Trust</h5>
+        <ul>
+          <li><a href="#">Security · SOC 2</a></li>
+          <li><a href="#">Model card</a></li>
+          <li><a href="#">Bias audits</a></li>
+          <li><a href="#">DPA</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 Caliper Underwriting Systems, Inc.</div>
+      <div>Built in Hartford, CT &nbsp;·&nbsp; NAIC partner since 2024</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
